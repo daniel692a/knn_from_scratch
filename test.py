@@ -1,13 +1,21 @@
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
+
+
 def most_common(lst):
     return max(set(lst), key=lst.count)
+
 def euclidean(point, data):
-    # Euclidean distance between points a & data
     return np.sqrt(np.sum((point - data)**2, axis=1))
+
+
 class KNeighborsClassifier:
     def __init__(self, k=5, dist_metric=euclidean):
         self.k = k
@@ -26,27 +34,42 @@ class KNeighborsClassifier:
         y_pred = self.predict(X_test)
         accuracy = sum(y_pred == y_test) / len(y_test)
         return accuracy
-# Unpack the iris dataset, from UCI Machine Learning Repository
+
 iris = datasets.load_iris()
 X = iris['data']
 y = iris['target']
-# Split data into train & test sets
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-# Preprocess data
 ss = StandardScaler().fit(X_train)
 X_train, X_test = ss.transform(X_train), ss.transform(X_test)
-# Test knn model across varying ks
 accuracies = []
 ks = range(1, 6)
+
 for k in ks:
     knn = KNeighborsClassifier(k=k)
     knn.fit(X_train, y_train)
     accuracy = knn.evaluate(X_test, y_test)
     accuracies.append(accuracy)
-# Visualize accuracy vs. k
 fig, ax = plt.subplots()
 ax.plot(ks, accuracies)
+
 ax.set(xlabel="k",
        ylabel="Accuracy",
-       title="Performance of knn")
+       title="Performance of knn  from scratch")
+
+test_accuracy = []
+
+for i in ks:
+    knn = KNeighborsClassifier(k=i)
+    knn.fit(X_train, y_train)
+    y_pred = knn.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    test_accuracy.append(test_accuracy)
+
+fig, ax = plt.subplots()
+ax.plot(ks, accuracies)
+
+ax.set(xlabel="k",
+       ylabel="Accuracy",
+       title="Performance of knn from sklearn")
 plt.show()
